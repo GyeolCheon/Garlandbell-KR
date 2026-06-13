@@ -1,0 +1,725 @@
+﻿<!DOCTYPE html>
+<!--
+MIT License
+
+Copyright (c) 2018 Chris Faulhaber
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>갈론드 벨 — 파이널 판타지 14 채집·낚시 타이머 (황금 7.x)</title>
+
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+    <meta name="description" content="갈론드 벨 — 파이널 판타지 14(FFXIV) 채집·낚시 스폰 타이머. 황금(7.x) 지원, 한국 서버 공식 명칭. 미채취·시간제·전설 채집 노드와 낚시 출현 시간을 에오르제아 시간으로 알려줍니다." />
+    <meta name="keywords" content="갈론드 벨, 갈론드벨, 파이널판타지14, FFXIV, 파판14, 채집 타이머, 낚시 타이머, 황금, 7.0, 에오르제아 시간, 미채취, 전설 채집" />
+    <link rel="canonical" href="https://gyeolcheon.github.io/Garlandbell-KR/" />
+    <meta name="theme-color" content="#0b0f17" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="갈론드 벨" />
+    <meta property="og:title" content="갈론드 벨 — FFXIV 채집·낚시 타이머 (황금 7.x)" />
+    <meta property="og:description" content="파이널 판타지 14 채집·낚시 스폰 타이머. 황금(7.x) 지원, 한국 서버 공식 명칭." />
+    <meta property="og:url" content="https://gyeolcheon.github.io/Garlandbell-KR/" />
+    <meta property="og:image" content="https://gyeolcheon.github.io/Garlandbell-KR/icons/PWA-512.png" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="갈론드 벨 — FFXIV 채집·낚시 타이머" />
+    <meta name="twitter:description" content="파이널 판타지 14 채집·낚시 스폰 타이머. 황금(7.x) 지원." />
+    <meta name="twitter:image" content="https://gyeolcheon.github.io/Garlandbell-KR/icons/PWA-512.png" />
+    <link rel="shortcut icon" type="image/png" href="favicon.png?v260613" />
+    <link rel="manifest" href="manifest.json?v200718" />
+    <link rel="stylesheet" href="style.css?v200718" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="theme.css?v260613" />
+
+    <script src="./db/ext/jquery-3.1.1.min.js"></script>
+    <script src="./db/ext/underscore-1.8.3.min.js"></script>
+    <script src="./db/ext/isotope-3.0.1.pkgd.min.js"></script>
+    <script src="./db/ext/doT.min.js"></script>
+    <script src="./db/ext/fastclick.js"></script>
+
+    <script src="gt.bell.min.js?v220518"></script>
+    <script src="nodes.min.js??v220510"></script>
+    <script src="timers.min.js?v220510"></script>
+    <script src="fish.min.js?v220510"></script>
+    <script src="locale-ko.min.js?v220510"></script>
+
+    <script>
+      $(gt.bell.initialize);
+    </script>
+
+    <script id="timer-list-table-template" type="text/x-dot-template">
+      <table {{?it.main}}id="lmain"{{?}} class="timer-list node-list table-layout {{?!it.main}}user-list{{?}} {{?it.active}}active{{?}} {{?it.hidden}}hidden{{?}}" data-name="{{=it.name}}">
+          <thead>
+              <tr class="header">
+                  <td colspan="11"><img class="header-icon" src="./db/images/Clock.svg"> {{=gt.t(it.name)}}</td>
+              </tr>
+              <tr class="header-labels">
+                  <td class="icon"></td>
+                  <td class="name">{{=gt.t('Name')}}</td>
+                  <td class="active">{{=gt.t('Active')}}</td>
+                  <td class="local-time">{{=gt.t('Local Time')}}</td>
+                  <td class="area">{{=gt.t('Area')}}</td>
+                  <td class="zone">{{=gt.t('Zone')}}</td>
+                  <td class="coords">{{=gt.t('Coords')}}</td>
+                  <td class="eorzea-time">{{=gt.t('Eorzea Time')}}</td>
+                  <td class="conditions">{{=gt.t('Conditions')}}</td>
+                  <td class="type-icons"></td>
+              </tr>
+          </thead>
+      </table>
+    </script>
+
+    <script id="timer-list-block-template" type="text/x-dot-template">
+      <div {{?it.main}}id="lmain"{{?}} class="timer-list block-layout {{?!it.main}}user-list{{?}} {{?it.active}}active{{?}} {{?it.hidden}}hidden{{?}}" data-name="{{=it.name}}">
+          <div class="header"><img class="header-icon" src="./db/images/Clock.svg"> {{=gt.t(it.name)}}</div>
+          <div class="node-list"></div>
+      </div>
+    </script>
+
+    <script id="list-entry-template" type="text/x-dot-template">
+      <div class="entry">
+          ★ {{=it.name}}
+      </div>
+    </script>
+
+    <script id="node-content-block-template" type="text/x-dot-template">
+      <div class="entry-list">
+          {{~it.node.items :entry:itemIndex}}
+              <a class="entry" href="https://guide.ff14.co.kr/lodestone/search?keyword={{=encodeURIComponent(gt.t(entry.item))}}" target="_blank">
+                  <img src="files/icons/item/t/{{=entry.icon}}.png" class="icon">
+                  {{?entry.slot}}<span class="valign deemphasize">[{{=entry.slot}}]</span> {{?}}
+                  {{?entry.scrip}}
+                      <img src="files/icons/item/t/{{=gt.scrips[entry.scrip]}}.png" class="suffix-icon" title="{{=gt.t(entry.scrip)}}">
+                  {{??entry.reduce}}
+                      <img src="db/images/Reduce.png" class="suffix-icon" title="{{=gt.t('Aetherial Reduction possible')}}">
+                  {{??entry.collectable}}
+                      <img src="db/images/Collectable.png" class="suffix-icon" title="{{=gt.t('Collectable')}}">
+                  {{?}}
+                  <span class="valign">{{=gt.t(entry.item)}}</span>
+              </a>
+
+              {{?entry.reduce && entry.reduce.item}}
+                  <div class="bait">
+                      <img src="files/icons/item/t/{{=entry.reduce.icon}}.png" class="icon" title="{{=gt.t(entry.reduce.item)}}, 5단계 +">
+                  </div>
+              {{?}}
+          {{~}}
+      </div>
+
+      <div class="info deemphasize">
+          <img src="{{=it.typeIcon}}" class="type-icon">
+          <div class="zone-time"><span class="zone">{{=gt.t(it.node.zone)}}{{?it.node.coords}} ({{=it.node.coords[0]}}, {{=it.node.coords[1]}}){{?}}</span> @ <span class="times">{{=it.timeText}}</span></div>
+          <div class="type">Lv. {{=it.node.lvl}} {{=gt.util.stars(it.node.stars)}} {{=gt.t(it.node.name)}} {{=gt.t(it.node.type)}}</div>
+          {{?it.condition}}
+              <div class="condition">{{=it.condition}} ➜ {{=gt.t(it.bonus)}}</div>
+          {{?}}
+          <div class="clear"></div>
+      </div>
+    </script>
+
+    <script id="node-content-table-template" type="text/x-dot-template">
+      {{~it.node.items :entry:itemIndex}}
+          <tr>
+              <td><img src="files/icons/item/t/{{=entry.icon}}.png" class="icon"></td>
+              <td>
+                  {{?entry.slot}}<span class="deemphasize slot">[{{=entry.slot}}]</span> {{?}}
+                  {{?it.hidden}}<img src="icons/Check.svg" class="suffix-icon">{{?}}
+                  {{?entry.scrip}}
+                      <img src="files/icons/item/t/{{=gt.scrips[entry.scrip]}}.png" class="suffix-icon" title="{{=gt.t(entry.scrip)}}">
+                  {{??entry.reduce}}
+                      <img src="db/images/Reduce.png" class="suffix-icon" title="{{=gt.t('Aetherial Reduction possible')}}">
+                  {{??entry.collectable}}
+                      <img src="db/images/Collectable.png" class="suffix-icon" title="{{=gt.t('Collectable')}}">
+                  {{?}}
+
+                  <a class="entry" href="https://guide.ff14.co.kr/lodestone/search?keyword={{=encodeURIComponent(gt.t(entry.item))}}" target="_blank">{{=gt.t(entry.item)}}</a>
+
+                  {{?entry.reduce && entry.reduce.item}}
+                      <div class="bait">
+                          <img src="files/icons/item/t/{{=entry.reduce.icon}}.png" class="icon" title="{{=gt.t(entry.reduce.item)}}, 5단계 +">
+                      </div>
+                  {{?}}
+              </td>
+              <td class="countdown time-text">{{=it.progress.countdown}}</td>
+              <td class="spawn-time">{{=it.progress.time}}</td>
+              <td>{{=it.title}}</td>
+              <td>{{=gt.t(it.node.zone)}}</td>
+              <td>{{?it.node.coords}}{{=it.node.coords[0]}}, {{=it.node.coords[1]}}{{?}}</td>
+              <td>{{=it.timeText}}</td>
+              <td>
+                  {{?it.conditionAbbr}}{{=it.conditionAbbr}}{{?}}
+              </td>
+              <td>
+                  <img src="{{=it.typeIcon}}" class="suffix-icon">
+              </td>
+          </tr>
+      {{~}}
+    </script>
+
+    <script id="fish-bait-template" type="text/x-dot-template">
+      <div style="position:absolute; margin-top:-32px; right:4px;">
+      <div class="bait{{?it.tug||it.hookset}} token{{?}}">
+          {{~it.baitTokens :token:index}}
+              {{?token.comma}}
+                  <span class="comma">, </span>
+              {{??token.arrow}}
+                  <span class="valign">➜</span>
+              {{??}}
+                  {{?token.hookset}}<img src="files/icons/action/{{=gt.hookset[token.hookset]}}.png" class="type-icon radius hookset" title="{{=gt.t(token.hookset)}}">{{?}}
+                  {{?token.tug}}<i class="type-icon radius {{=token.tug}} tug" title="{{=gt.t(token.tug)}}">{{=gt.util.tug(token.tug)}}</i>{{?}}
+                  <img src="files/icons/item/t/{{=token.icon}}.png" class="icon{{?it.baitTokens[index+2] && (it.baitTokens[index+2].hookset||it.baitTokens[index+2].tug)}} token{{?}}" title="{{=token.name}}{{?token.mooch}} ({{=gt.t('mooch')}}){{?}}">
+              {{?}}
+          {{~}}
+          {{?it.hookset}}<img src="files/icons/action/{{=gt.hookset[it.hookset]}}.png" class="type-icon radius hookset" title="{{=gt.t(it.hookset)}}" style="margin-left:3px">{{?}}
+          {{?it.tug}}<i class="type-icon radius {{=it.tug}} tug" title="{{=gt.t(it.tug)}}" style="margin-left:3px">{{=gt.util.tug(it.tug)}}</i>{{?}}
+      </div>
+      </div>
+    </script>
+
+    <script id="fish-entry-block-template" type="text/x-dot-template">
+      <a class="entry" href="{{?it.ff14anglerId}}https://ko.ff14angler.com/index.php?fish={{=it.ff14anglerId}}{{??}}https://guide.ff14.co.kr/lodestone/search?keyword={{=encodeURIComponent(it.name)}}{{?}}" target="_blank">
+          <img src="files/icons/item/t/{{=it.icon}}.png" class="icon">
+          <span class="valign">{{=it.name}}{{?it.predatorAmount}} [{{=it.predatorAmount}}]{{?}}</span>
+
+          {{?it.collectable}}
+              <img src="db/images/Collectable.png" class="suffix-icon" title="{{=gt.t('Collectable')}}">
+          {{?}}
+          {{?it.scrip}}
+              <img src="files/icons/item/t/{{=gt.scrips[it.scrip]}}.png" class="suffix-icon" title="{{=gt.t(it.scrip)}}">
+          {{?}}
+          {{?it.reduce}}
+              <img src="db/images/Reduce.png" class="suffix-icon" title="{{=gt.t('Aetherial Reduction possible')}}">
+          {{?}}
+          {{?it.folklore}}
+              <img src="files/icons/item/t/26164.png" class="suffix-icon" title="{{=gt.t('Tome of Ichthyological Folklore')}}">
+          {{?}}
+          {{?it.fishEyes}}
+              <img src="files/icons/action/1112.png" class="suffix-icon" title="{{=gt.t('Fish Eyes required')}}">
+          {{?}}
+          {{?it.snagging}}
+              <img src="files/icons/action/1109.png" class="suffix-icon" title="{{=gt.t('Snagging required')}}">
+          {{?}}
+      </a>
+
+      {{=gt.layout.templates.fishBait(it)}}
+    </script>
+
+    <script id="fish-content-block-template" type="text/x-dot-template">
+      {{ let durings, weathers, transitions; if (it.def.duringReal||it.def.duringReal==false) {durings = it.def.duringReal} else {durings = it.def.during}; if (it.def.weatherReal||it.def.weatherReal==false) {weathers = it.def.weatherReal} else {weathers = it.def.weather}; if (it.def.transitionReal||it.def.transitionReal==false) {transitions = it.def.transitionReal} else {transitions = it.def.transition};}}
+      <div class="entry-list">
+          {{=gt.layout.engine.templates.fishEntry(it.def)}}
+          {{?it.def.predator}}
+              {{~it.def.predator :predator:pindex}}
+                  <div class="clear"></div>
+                  {{=gt.layout.engine.templates.fishEntry(predator)}}
+              {{~}}
+          {{?}}
+      </div>
+
+      <div class="info deemphasize">
+          <img src="{{=it.typeIcon}}" class="type-icon">
+          <div class="zone-time">
+              <span class="zone">{{=gt.t(it.def.zone)}}{{?it.def.coords}} ({{=parseInt(it.def.coords[0])}}, {{=parseInt(it.def.coords[1])}}){{?}}</span>
+              {{?durings}}
+                  @ {{=gt.bell.formatHours(durings.start)}} - {{=gt.bell.formatHours(durings.end)}}
+              {{?}}
+          </div>
+          <div class="type">Lv. {{=it.def.lvl}} {{=gt.util.stars(it.def.stars)}} {{=gt.t(it.def.category)}}</div>
+          <div class="condition">
+              {{?transitions}}
+                  {{=gt.t(transitions).join(', ')}} ➜
+              {{?}}
+              {{?weathers}}
+                  {{=gt.t(weathers).join(', ')}}
+              {{?}}
+          </div>
+          <div class="clear"></div>
+      </div>
+    </script>
+
+    <script id="fish-content-table-template" type="text/x-dot-template">
+      {{ let durings, weathers, transitions; if (it.def.duringReal||it.def.duringReal==false) {durings = it.def.duringReal} else {durings = it.def.during}; if (it.def.weatherReal||it.def.weatherReal==false) {weathers = it.def.weatherReal} else {weathers = it.def.weather}; if (it.def.transitionReal||it.def.transitionReal==false) {transitions = it.def.transitionReal} else {transitions = it.def.transition};}}
+      <tr>
+          <td><img src="{{=it.icon}}" class="icon"></td>
+          <td>
+              {{?it.hidden}}<img src="icons/Check.svg" class="suffix-icon">{{?}}
+              {{?it.def.collectable}}
+                  <img src="db/images/Collectable.png" class="suffix-icon" title="{{=gt.t('Collectable')}}">
+              {{?}}
+              {{?it.def.scrip}}
+                  <img src="files/icons/item/t/{{=gt.scrips[it.def.scrip]}}.png" class="suffix-icon" title="{{=gt.t(it.def.scrip)}}">
+              {{?}}
+              {{?it.def.reduce}}
+                  <img src="db/images/Reduce.png" class="suffix-icon" title="{{=gt.t('Aetherial Reduction possible')}}">
+              {{?}}
+
+              <a class="entry" href="{{?it.def.ff14anglerId}}https://ko.ff14angler.com/index.php?fish={{=it.def.ff14anglerId}}{{??}}https://guide.ff14.co.kr/lodestone/search?keyword={{=encodeURIComponent(it.def.name)}}{{?}}" target="_blank">
+                  {{=it.def.name}}{{?it.def.predatorAmount}} [{{=it.def.predatorAmount}}]{{?}}
+              </a>
+
+              {{=gt.layout.templates.fishBait(it.def)}}
+          </td>
+          {{?it.progress}}
+              <td class="countdown time-text">{{=it.progress.countdown}}</td>
+              <td class="spawn-time">{{=it.progress.time}}</td>
+          {{??}}
+              <td></td>
+              <td></td>
+          {{?}}
+          <td>{{=it.title}}</td>
+          <td>{{=gt.t(it.def.zone)}}</td>
+          <td>{{?it.def.coords}}{{=parseInt(it.def.coords[0])}}, {{=parseInt(it.def.coords[1])}}{{?}}</td>
+          <td>
+              {{?durings}}
+                  {{=gt.bell.formatHours(durings.start)}} - {{=gt.bell.formatHours(durings.end)}}
+              {{?}}
+          </td>
+          <td class="weather">
+              {{?it.def.folklore}}
+                  <img src="files/icons/item/t/26164.png" class="suffix-icon" title="{{=gt.t('Tome of Ichthyological Folklore')}}">
+              {{?}}
+              {{?it.def.fishEyes}}
+                  <img src="files/icons/action/1112.png" class="suffix-icon" title="{{=gt.t('Fish Eyes required')}}">
+              {{?}}
+              {{?it.def.snagging}}
+                  <img src="files/icons/action/1109.png" class="suffix-icon" title="{{=gt.t('Snagging required')}}">
+              {{?}}
+
+              {{?transitions}}
+                  {{~transitions :weather:windex}}
+                      <img src="files/icons/weather/{{=weather}}.png" title="{{=gt.t(weather)}}" class="suffix-icon">
+                  {{~}}
+                   <span class="valign">➜</span>
+              {{?}}
+              {{?weathers}}
+                  {{~weathers :weather:windex}}
+                      <img src="files/icons/weather/{{=weather}}.png" title="{{=gt.t(weather)}}" class="suffix-icon">
+                  {{~}}
+              {{?}}
+          </td>
+          <td>
+              <img src="{{=it.typeIcon}}" class="suffix-icon">
+          </td>
+      </tr>
+
+      {{?it.predator}}
+          {{~it.predator :predator:predIndex}}
+              {{=predator.contentTemplate(predator)}}
+          {{~}}
+      {{?}}
+    </script>
+
+    <script id="timer-table-template" type="text/x-dot-template">
+      <tbody class="timer {{=it.type}} {{?it.progress}}{{=it.progress.state}}{{??}}untimed{{?}} {{?it.star}}star{{?}} {{?it.hidden}}hidden{{?}}" data-id="{{=it.id}}">
+          {{?it.contentTemplate}}
+              {{=it.contentTemplate(it)}}
+          {{??}}
+              <tr>
+                  <td><img src="{{=it.icon}}" class="icon"></td>
+                  <td>
+                      {{?it.hidden}}<img src="icons/Check.svg" class="suffix-icon">{{?}}
+                      {{=gt.t(it.desc)}}
+                  </td>
+                  <td class="countdown time-text">{{=it.progress.countdown}}</td>
+                  <td class="spawn-time">{{=it.progress.time}}</td>
+                  <td>{{=gt.t(it.title || "")}}</td>
+                  <td>{{=gt.t(it.zone)}}</td>
+                  <td>{{?it.def.coords}}{{=parseInt(it.def.coords[0])}}, {{=parseInt(it.def.coords[1])}}{{?}}</td>
+                  <td>{{?it.timeText}}{{=it.timeText}}{{?}}</td>
+                  <td>{{?it.conditions}}{{=it.conditions}}{{?}}</td>
+                  <td>{{?it.typeIcon}}<img src="{{=it.typeIcon}}" class="suffix-icon">{{?}}</td>
+              </tr>
+          {{?}}
+      </tbody>
+    </script>
+
+    <script id="timer-block-template" type="text/x-dot-template">
+      {{?it.progress}}
+          <div class="timer {{=it.type}} {{=it.progress.state}} {{?it.star}}star{{?}} {{?it.hidden}}hidden{{?}}" data-time="{{=it.progress.sort}}" data-active="{{=it.progress.state == 'active' ? 1 : 0}}" data-id="{{=it.id}}">
+      {{??}}
+          <div class="timer {{=it.type}} untimed {{?it.star}}star{{?}} {{?it.hidden}}hidden{{?}}" data-time="0" data-active="0" data-id="{{=it.id}}">
+      {{?}}
+
+          <div class="title">
+              {{?it.hidden}}<img src="icons/Check.svg">{{?}}
+              <span class="text">{{=gt.t(it.title || "")}}</span>
+          </div>
+
+          {{?it.progress}}
+              <span class="spawn-time">{{=it.progress.countdown}} / {{=it.progress.time}}</span>
+
+              <div class="progress-container"><div class="progress" style="width: {{=it.progress.percent}}%;"></div></div>
+          {{?}}
+
+          <div class="content">
+              {{?it.contentTemplate}}
+                  {{=it.contentTemplate(it)}}
+              {{??}}
+                  <img src="{{=it.icon}}" class="type-icon">
+                  {{=gt.t(it.desc)}}
+              {{?}}
+          </div>
+      </div>
+    </script>
+
+    <script id="hunt-content-block-template" type="text/x-dot-template">
+      <div class="entry-list">
+          <span class="entry">
+              <img src="{{=it.icon}}" class="icon">
+              <span class="valign">{{=it.def.name}}</span>
+          </span>
+
+          {{?it.def.fish}}
+              <div class="clear"></div>
+              {{=gt.layout.engine.templates.fishEntry(it.def.fish)}}
+          {{?}}
+      </div>
+
+      <div class="info deemphasize">
+          <img src="{{=it.typeIcon}}" class="type-icon">
+          <div>{{=gt.t(it.cooldown)}}</div>
+          <div>{{=gt.t(it.def.conditions)}}</div>
+      </div>
+    </script>
+
+    <script id="hunt-content-table-template" type="text/x-dot-template">
+      <tr>
+          <td class="icon"><img src="{{=it.icon}}" class="icon"></td>
+          <td>
+              {{?it.hidden}}<img src="icons/Check.svg" class="suffix-icon">{{?}}
+              {{=it.def.name}}
+          </td>
+          <td class="countdown time-text">{{=it.progress.countdown}}</td>
+          <td class="spawn-time">{{=it.progress.time}}</td>
+          <td>{{=it.title}}</td>
+          <td></td>
+          <td></td>
+          <td colspan="2">{{=gt.t(it.def.conditions)}}</td>
+          <td><img class="suffix-icon" src="{{=it.typeIcon}}"></td>
+      </tr>
+      {{?it.fish}}
+          {{=it.fish.contentTemplate(it.fish)}}
+      {{??}}
+          <tr>
+              <td colspan="7"></td>
+              <td colspan="3">{{=it.cooldown}}</td>
+          </tr>
+      {{?}}
+    </script>
+
+    <script id="page-map-template" type="text/x-dot-template">
+      <div class="map-wrapper" data-id="{{=it.location.id}}">
+          <div class="map-container">
+              <span class="region">{{=gt.t(it.location.name)}}</span>
+              <span class="position"></span>
+              <canvas width="383" height="383" class="base map"></canvas>
+              <canvas width="383" height="383" class="points"></canvas>
+          </div>
+      </div>
+    </script>
+
+    <script id="main-template" type="text/x-dot-template">
+      <div id="sidebar">
+          <div id="time">#:##</div>
+
+          <div id="filters">
+              <div class="subheader">{{=gt.t('Search')}}</div>
+              <div id="search-bar">
+                  <input type="search" id="search">
+              </div>
+
+              <div class="subheader">{{=gt.t('Patches')}}</div>
+              <div data-filter=".patch-2" data-invert="0" class="active filter button short" title="{{=gt.t('A Realm Reborn')}}">2.0</div>
+              <div data-filter=".patch-3" data-invert="0" class="active filter button short" title="{{=gt.t('Heavensward')}}">3.0</div>
+              <div data-filter=".patch-4" data-invert="0" class="active filter button short" title="{{=gt.t('Stormblood')}}">4.0</div>
+              <div data-filter=".patch-5" data-invert="0" class="active filter button short" title="{{=gt.t('Shadowbringers')}}">5.0</div>
+              <div data-filter=".patch-6" data-invert="0" class="active filter button short" title="{{=gt.t('Endwalker')}}">6.0</div>
+              <div data-filter=".patch-7" data-invert="0" class="active filter button short" title="{{=gt.t('Dawntrail')}}">7.0</div>
+
+              <div class="subheader">{{=gt.t('Classes')}}</div>
+              <div data-filter=".miner" data-invert="0" class="active filter button short"><img src="files/icons/job/MIN.png" title="{{=gt.t('Mining')}}"></div>
+              <div data-filter=".botanist" data-invert="0" class="active filter button short"><img src="files/icons/job/BTN.png" title="{{=gt.t('Botany')}}"></div>
+              <div data-filter=".fish" data-invert="0" class="active filter button short"><img src="files/icons/job/FSH.png" title="{{=gt.t('Fishing')}}"></div>
+
+              <div class="subheader">{{=gt.t('Types')}}</div>
+              <div data-filter=".unspoiled" data-invert="0" class="active filter button center">{{=gt.t('Unspoiled')}}</div>
+              <div data-filter=".ephemeral" data-invert="0" class="active filter button center">{{=gt.t('Ephemeral')}}</div>
+              <div data-filter=".legendary" data-invert="0" class="active filter button center">{{=gt.t('Legendary')}}</div>
+
+              <div class="subheader">{{=gt.t('Tasks')}}</div>
+
+              <div data-filter=".reducible" data-invert="1" data-exclusive="task" class="filter button short" title="{{=gt.t('Reducible')}}"><img src="db/images/Reduce.png"></div>
+              <div data-filter=".whitescrips" data-invert="1" data-exclusive="task" class="filter button short" title="{{=gt.t('White Scrips')}}"><img src="files/icons/item/t/65069.png"></div>
+              <div data-filter=".purplescrips" data-invert="1" data-exclusive="task" class="filter button short" title="{{=gt.t('Purple Scrips')}}"><img src="files/icons/item/t/65087.png"></div>
+              <div data-filter=".hidden" data-invert="1" data-exclusive="task" class="filter button short" title="{{=gt.t('Hidden')}}"><img src="icons/Check.svg"></div>
+
+              <div class="subheader">{{=gt.t('Other')}}</div>
+              <div data-filter=".GATE" data-invert="0" class="active filter button"><img src="icons/GATE.png">{{=gt.t('Gold S.')}}</div>
+              <div data-filter=".hunt" data-invert="0" class="active filter button"><img src="icons/Hunt.png">{{=gt.t('Hunt')}}</div>
+          </div>
+
+          <div id="node-stats" class="deemphasize"></div>
+      </div>
+
+      <div id="main-content">
+          <div id="title">
+              <span id="options">
+                  <img src="icons/Bell.svg" id="alarm-toggle" class="active" role="button" tabindex="0" alt="즐겨찾기 알람 켜기/끄기">
+                  <img src="db/images/Flat.png" id="mode-toggle" role="button" tabindex="0" alt="카드형/리스트형 보기 전환">
+                  <img src="db/images/Setting.png" id="settings-toggle" role="button" tabindex="0" alt="설정 열기">
+                  <div id="theme-toggle" title="다크/라이트 전환" role="switch" tabindex="0" aria-label="다크/라이트 모드 전환" aria-checked="false"><span class="knob"></span><span>🌙</span><span>☀️</span></div>
+              </span>
+
+              <a href="./" title="* 갈론드 벨의 갈론드는 사실 파판1의 최종 보스인 갈란드(정식 번역명 : 가랜드)의 오역입니다.&#10; 이제와서 고치기엔 너무 많은 시간이 지났으니 일종의 이스터에그라고 생각해주세요. XD">갈론드 벨</a>
+          </div>
+
+          <div id="warnings">
+              <div id="audio-blocked" class="warning" style="display: none;">{{=gt.t('Audio is blocked until you interact with the page.  Dismiss this warning to reenable.')}} <span class="dismiss-link">{{=gt.t('Dismiss.')}}</span></div>
+              <div id="preload-failed" class="warning" style="display: none;">{{=gt.t('Audio preloading is not supported by your browser.  The first notification you receive may not play properly.')}} <span class="dismiss-link">{{=gt.t('Dismiss.')}}</span></div>
+              <div id="notification-blocked" class="warning" style="display: none;">{{=gt.t('Popup notifications can not be displayed.')}} <span class="dismiss-link">{{=gt.t('Dismiss.')}}</span></div>
+              <div id="storage-blocked" class="warning" style="display: none;">{{=gt.t('Local storage is blocked by your browser.  You may be in private browsing mode.  Changes will not be saved.')}} <span class="dismiss-link">{{=gt.t('Dismiss.')}}</span></div>
+          </div>
+
+          <div id="settings">
+              <div class="header">{{=gt.t('Settings')}}</div>
+              <table class="alarm-options">
+                  <tr>
+                      <td class="label">{{=gt.t('Early Warning Alarm')}}</td>
+                      <td>
+                          <select id="tone">
+                              <option value="alarm1" selected="selected">{{=gt.t('Linkshell')}}</option>
+                              <option value="alarm2">{{=gt.t('Tell 1')}}</option>
+                              <option value="alarm3">{{=gt.t('Tell 2')}}</option>
+                              <option value="alarm4">{{=gt.t('Tell 3')}}</option>
+                          </select>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td class="label">{{=gt.t('Spawn Alarm')}}</td>
+                      <td>
+                          <select id="tone2">
+                              <option value="alarm1">{{=gt.t('Linkshell')}}</option>
+                              <option value="alarm2" selected="selected">{{=gt.t('Tell 1')}}</option>
+                              <option value="alarm3">{{=gt.t('Tell 2')}}</option>
+                              <option value="alarm4">{{=gt.t('Tell 3')}}</option>
+                          </select>
+                      </td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Alarm tone to sound for favorite nodes.')}}</td></tr>
+                  <tr>
+                      <td class="label">{{=gt.t('Early Warning Volume')}}</td>
+                      <td><input type="range" id="volume" value="50" min="0" max="100"></td>
+                  </tr>
+                  <tr>
+                      <td class="label">{{=gt.t('Spawn Volume')}}</td>
+                      <td><input type="range" id="volume2" value="50" min="0" max="100"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Volume of the alarm.')}}</td></tr>
+                  <tr>
+                      <td class="label">{{=gt.t('Early Warning Time')}}</td>
+                      <td><input type="number" id="warning" value="60" min="0" max="300"></td>
+                  </tr>
+                  <tr>
+                      <td class="label">{{=gt.t('Spawn Time')}}</td>
+                      <td><input type="number" id="warning2" value="3" min="0" max="300"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Wait this number of real seconds before sounding the alarm.')}}</td></tr>
+                  <tr>
+                      <td class="label"><label for="unlimited-columns-setting">{{=gt.t('Unlimited Columns')}}</label></td>
+                      <td><input type="checkbox" id="unlimited-columns-setting"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Use as many columns as possible.')}}</td></tr>
+                  <tr>
+                      <td class="label"><label for="compact-setting">{{=gt.t('Compact')}}</label></td>
+                      <td><input type="checkbox" id="compact-setting"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Compact timer information to the essentials.')}}</td></tr>
+                  <tr>
+                      <td class="label"><label for="colorblind-setting">{{=gt.t('Colorblind')}}</label></td>
+                      <td><input type="checkbox" id="colorblind-setting"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Alter active bar colors to better suit colorblind users.')}}</td></tr>
+                  <tr>
+                      <td class="label"><label for="servertime-setting">{{=gt.t('Server Time')}}</label></td>
+                      <td><input type="checkbox" id="servertime-setting"></td>
+                  </tr>
+                  <tr><td colspan="2" class="deemphasize">{{=gt.t('Calibrate time with the server.  Use if your time is wrong.')}}</td></tr>
+                  <tr><td class="label">GarlandTools</td><td><a class="deemphasize" href="http://www.garlandtools.org">http://www.garlandtools.org</a></td></tr>
+                  <tr><td class="label">Github</td><td><a class="deemphasize" href="https://github.com/Ariette/garlandbell">https://github.com/Ariette/garlandbell</a></td></tr>
+              </table>
+          </div>
+
+          <div class="header" id="timeline-header">
+              <img class="header-icon" src="icons/Ruler.svg">
+              {{=gt.t('Timeline')}}
+          </div>
+          <div id="timeline">
+              <div class="hand"></div>
+              <div id="timeslots"></div>
+              <div class="hours"></div>
+          </div>
+
+          <div id="maps-section">
+              <div class="header" id="maps-header">
+                  <img src="db/images/Location.svg" class="header-icon">
+                  {{=gt.t('Maps')}}
+              </div>
+              <div id="maps"></div>
+          </div>
+
+          <div id="timer-container"></div>
+      </div>
+
+      <div id="list-popover">
+          <h2>{{=gt.t('Select a list for this timer')}}</h2>
+          <div id="list-popover-timer" class="block-layout"></div>
+          <div id="list-popover-check">
+              <div class="entry">
+                  <img src="icons/Check.svg">
+                  {{=gt.t('Completed')}}
+              </div>
+          </div>
+          <div id="list-popover-entries"></div>
+      </div>
+      <div id="global-popover-overlay"></div>
+      <div id="timer-remove-overlay">
+          <div>{{=gt.t('Remove from list?  Click again to confirm.')}}</div>
+      </div>
+
+      <audio id="alarm1" preload="none">
+          <source src="db/audio/alarm.ogg" type="audio/ogg">
+          <source src="db/audio/alarm.mp3" type="audio/mpeg">
+      </audio>
+      <audio id="alarm2" preload="none">
+          <source src="db/audio/alarm2.ogg" type="audio/ogg">
+          <source src="db/audio/alarm2.mp3" type="audio/mpeg">
+      </audio>
+      <audio id="alarm3" preload="none">
+          <source src="db/audio/alarm3.ogg" type="audio/ogg">
+          <source src="db/audio/alarm3.mp3" type="audio/mpeg">
+      </audio>
+      <audio id="alarm4" preload="none">
+          <source src="db/audio/alarm4.ogg" type="audio/ogg">
+          <source src="db/audio/alarm4.mp3" type="audio/mpeg">
+      </audio>
+    </script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-162309095-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-162309095-1');
+    </script>
+  </head>
+  <body>
+    자바스크립트를 실행할 수 없습니다! IE 등 오래된 브라우저를 사용 중이시라면
+    Chrome, Firefox, Opera, Safari 등 최신 브라우저로 접속해주세요.<br />
+    동일한 문제가 계속 발생할 때에는
+    <a href="https://github.com/Ariette/garlandbell/issues"
+      >깃허브 이슈 페이지</a
+    >로 문의하십시오.
+  </body>
+  <script type="text/javascript">
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./service-worker.js').catch((err) => {
+          console.log('Service Worker Register Faild.', err);
+        });
+      });
+    }
+  </script>
+  <script type="text/javascript" src="//wcs.naver.net/wcslog.js"></script>
+  <script type="text/javascript">
+    /* 다크/라이트 테마 토글 (시안 3). localStorage에 저장. */
+    (function () {
+      // 저장된 테마를 렌더 전에 먼저 적용 (깜빡임 방지)
+      try {
+        if (localStorage.getItem('gb-theme') === 'light' && document.body) {
+          document.body.classList.add('light');
+        }
+      } catch (e) {}
+
+      // 토글은 #main-template 안에 있어 재렌더(레이아웃 전환 등)마다 새로 생성됨
+      // → document 위임으로 처리해야 리스너가 유실되지 않음
+      function syncToggleAria(el) {
+        if (el) el.setAttribute('aria-checked', document.body.classList.contains('light') ? 'true' : 'false');
+      }
+      function toggleTheme(el) {
+        var light = document.body.classList.toggle('light');
+        try { localStorage.setItem('gb-theme', light ? 'light' : 'dark'); } catch (e2) {}
+        syncToggleAria(el);
+      }
+      document.addEventListener('click', function (e) {
+        var t = e.target && e.target.closest && e.target.closest('#theme-toggle');
+        if (t) toggleTheme(t);
+      });
+      // 키보드 조작: Enter/Space로 토글·버튼 활성화 (Space 기본 스크롤 방지)
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar' && e.keyCode !== 13 && e.keyCode !== 32) return;
+        if (!e.target || !e.target.closest) return;
+        var t = e.target.closest('#theme-toggle');
+        if (t) { e.preventDefault(); toggleTheme(t); return; }
+        var btn = e.target.closest('#alarm-toggle, #mode-toggle, #settings-toggle');
+        if (btn) { e.preventDefault(); btn.click(); }
+      });
+      // 스크린리더가 포커스 시 현재 상태(다크/라이트)를 읽도록 동기화 (재렌더 후 포함)
+      document.addEventListener('focusin', function (e) {
+        var t = e.target && e.target.closest && e.target.closest('#theme-toggle');
+        if (t) syncToggleAria(t);
+      });
+
+      // 모든 이미지에 alt 부여 (접근성/SEO). title 있으면 그 값, 없으면 장식용 alt="".
+      // 명시적 alt/aria-label/role 이 있는 이미지는 건드리지 않음.
+      function enhanceAlt(scope) {
+        var imgs = (scope || document).querySelectorAll('img:not([alt])');
+        for (var i = 0; i < imgs.length; i++) {
+          var im = imgs[i];
+          if (im.getAttribute('aria-label') || im.getAttribute('role')) continue;
+          var ti = im.getAttribute('title');
+          im.setAttribute('alt', ti || '');
+        }
+      }
+      enhanceAlt(document);
+      // 타이머 카드는 필터/레이아웃 전환 때 다시 그려지므로 새로 추가된 노드도 처리
+      try {
+        var altObserver = new MutationObserver(function (muts) {
+          for (var i = 0; i < muts.length; i++) {
+            if (muts[i].addedNodes && muts[i].addedNodes.length) { enhanceAlt(document); break; }
+          }
+        });
+        if (document.body) altObserver.observe(document.body, { childList: true, subtree: true });
+      } catch (e3) {}
+    })();
+  </script>
+  <script type="text/javascript">
+    if (!wcs_add) var wcs_add = {};
+    wcs_add['wa'] = 'bda4221643756';
+    if (gt.bell.isLive) wcs_do();
+  </script>
+</html>

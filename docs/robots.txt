@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gyeolcheon.github.io/Garlandbell-KR/sitemap.xml

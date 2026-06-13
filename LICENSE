@@ -1,0 +1,36 @@
+MIT License
+
+This project ("한국 갈론드 벨" / Korean Garland Bell) is a non-commercial fan
+tool for FINAL FANTASY XIV, built upon the open-source GarlandTools project.
+
+Original work:
+  Copyright (c) GarlandTools contributors (ufx) — https://github.com/ufx/GarlandTools
+Derivative works:
+  Copyright (c) arlequins — https://github.com/arlequins/garlandbell
+  Copyright (c) Ariette (한국 서버판) — https://github.com/Ariette/garlandbell
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+FINAL FANTASY XIV game data, item names, and icons are © SQUARE ENIX CO., LTD.
+Used under the FINAL FANTASY XIV Materials Usage License for non-commercial
+fan content. This tool is not affiliated with or endorsed by Square Enix.
+Korean translation text rights belong to their respective holders
+((주)액토즈소프트 / Actoz Soft for official in-game terminology).

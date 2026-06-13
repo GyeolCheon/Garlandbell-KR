@@ -1,0 +1,6 @@
+# 개발 산출물 / 임시 파일 (배포 불필요)
+_*.png
+_*.html
+*.log
+.DS_Store
+Thumbs.db
