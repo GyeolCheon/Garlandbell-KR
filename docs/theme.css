@@ -1,25 +1,28 @@
 /* ===========================================================================
-   갈론드 벨 — 모던 테마 (시안 3: 하이브리드 다크/라이트)
+   갈론드 벨 — FFXIV HUD 테마 (시안 4)
    style.css 위에 얹는 비주얼 오버레이. 엔진의 표시/숨김 로직은 건드리지 않음.
+   게임 내 HUD 감성: 수정/에테르 글로우 · 골드 헤어라인 + 코너 틱 · 패널 프레임.
    원작: GarlandTools(ufx, MIT) · GarlandBell(arlequins) · 한국판(Ariette)
    =========================================================================== */
 
 :root{
-  --bg:#0b0f17; --bg2:#0e131d; --bg3:#121826;
+  --bg:#070a11; --bg2:#0c111b; --bg3:#111726;
   --card:rgba(255,255,255,.045); --card-h:rgba(255,255,255,.08);
-  --stroke:rgba(255,255,255,.09); --stroke-2:rgba(255,255,255,.16);
-  --txt:#eaf0f8; --muted:#a6aebe; --dim:#7e8799;
-  --accent:#7c83ff; --accent2:#56d3c2; --gold:#ffce6a; --violet:#b89cff;
-  --blue:#5cb6ff; --rose:#ff7a8a; --green:#56d3c2;
-  --r:16px; --r-sm:10px; --shadow:0 14px 40px rgba(0,0,0,.45);
+  --stroke:rgba(255,255,255,.07); --stroke-2:rgba(255,255,255,.14);
+  --gold:#e3c684; --gold-line:rgba(227,198,132,.22); --gold-dim:rgba(227,198,132,.30);
+  --txt:#eef2fa; --muted:#9aa6bd; --dim:#6b768c;
+  --accent:#64e3d3; --accent2:#68b6ff; --amber:#ffb24a; --violet:#c0a3ff;
+  --blue:#68b6ff; --rose:#ff7d8e; --green:#64e3d3;
+  --r:14px; --r-sm:9px; --shadow:0 14px 40px rgba(0,0,0,.45);
 }
 body.light{
-  --bg:#eef1f6; --bg2:#f7f9fc; --bg3:#ffffff;
+  --bg:#e8ecf3; --bg2:#f4f7fb; --bg3:#ffffff;
   --card:#ffffff; --card-h:#ffffff;
-  --stroke:#e4e8ef; --stroke-2:#d4dae3;
-  --txt:#161a22; --muted:#5e6675; --dim:#9aa2b0;
-  --accent:#6366f1; --accent2:#0d9488; --gold:#d97706; --violet:#7c3aed;
-  --blue:#2563eb; --green:#0d9488;
+  --stroke:rgba(20,30,55,.10); --stroke-2:rgba(20,30,55,.18);
+  --gold:#9a7b34; --gold-line:rgba(154,123,52,.30); --gold-dim:rgba(154,123,52,.26);
+  --txt:#161b25; --muted:#56607a; --dim:#8c95a8;
+  --accent:#0e9e8d; --accent2:#2f78d6; --amber:#cf7a16; --violet:#7b53d6;
+  --blue:#2f78d6; --green:#0e9e8d;
   --shadow:0 12px 32px rgba(20,30,55,.12);
 }
 
@@ -27,8 +30,8 @@ body.light{
 body{
   font-family:Pretendard,-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",sans-serif !important;
   background:
-    radial-gradient(1100px 520px at 82% -12%, rgba(124,131,255,.16), transparent 60%),
-    radial-gradient(900px 520px at -2% 4%, rgba(86,211,194,.12), transparent 55%),
+    radial-gradient(1100px 540px at 86% -14%, rgba(100,227,211,.10), transparent 60%),
+    radial-gradient(900px 520px at -4% 6%, rgba(227,198,132,.09), transparent 55%),
     var(--bg) !important;
   color:var(--txt) !important;
   text-shadow:none !important;
@@ -38,8 +41,8 @@ body{
 }
 body.light{
   background:
-    radial-gradient(1000px 480px at 85% -10%, rgba(99,102,241,.10), transparent 60%),
-    radial-gradient(820px 480px at -2% 2%, rgba(13,148,136,.08), transparent 55%),
+    radial-gradient(1000px 480px at 86% -12%, rgba(14,158,141,.08), transparent 60%),
+    radial-gradient(820px 480px at -4% 4%, rgba(154,123,52,.07), transparent 55%),
     var(--bg) !important;
 }
 a{color:inherit}
@@ -48,19 +51,25 @@ a{color:inherit}
 ::-webkit-scrollbar-thumb{border-radius:10px;background:var(--stroke-2)}
 ::-webkit-scrollbar-track{background:transparent}
 
+/* reusable HUD corner-tick frame (게임 창 프레임 모서리)
+   주의: #list-popover 는 style.css 에서 position:fixed(중앙 오버레이)라 여기서 건드리면 안 됨 */
+.block-layout .timer,#timeline,#maps-section #maps,#settings{position:relative}
+.block-layout .timer::after,#settings::after{
+  content:"";position:absolute;bottom:7px;right:7px;width:10px;height:10px;pointer-events:none;
+  border:1.5px solid var(--gold);border-width:0 1.5px 1.5px 0;opacity:.5;
+}
+
 /* ── Sidebar (compact) ── */
 #sidebar{
   width:172px !important;
-  background:var(--bg2) !important;
-  border-right:1px solid var(--stroke);
+  background:linear-gradient(180deg,var(--bg2),transparent), var(--bg) !important;
+  border-right:1px solid var(--gold-line);
   padding:14px 11px !important;
   background-image:none !important;
 }
-body.light #sidebar{background:var(--bg3) !important}
-/* base chips (used in the responsive top-bar layout) */
+body.light #sidebar{background:linear-gradient(180deg,var(--bg3),transparent), var(--bg) !important}
 #sidebar .button,#sidebar .filter.button{padding:7px 9px !important;margin:2.5px !important;font-size:12px}
 #sidebar .button.short{min-width:30px}
-/* ── Desktop: sidebar filters as a clean 2-column grid ── */
 @media(min-width:891px){
   #filters{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
   #filters .subheader,#filters #search-bar{grid-column:1 / -1}
@@ -70,10 +79,8 @@ body.light #sidebar{background:var(--bg3) !important}
     padding:8px 6px !important;line-height:1.1;
   }
   #filters .button img,#filters .filter.button img{margin:0 !important}
-  /* long-label buttons (골드 소서 / 마물사냥) span both columns */
   #filters .filter.button:not(.short):not(.center){grid-column:1 / -1}
 }
-/* fluid content: grows/shrinks with viewport, no fixed cap */
 #main-content{margin-left:172px !important;padding:18px 22px !important;max-width:none !important}
 
 #time{
@@ -81,12 +88,14 @@ body.light #sidebar{background:var(--bg3) !important}
   font-variant-numeric:tabular-nums;text-align:left !important;
   margin:2px 4px 4px !important;color:var(--txt);
 }
+#time::before{content:"◈ ";font-size:15px;color:var(--gold);vertical-align:3px}
 #time::after{content:"에오르제아 시간";display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0}
 
 #sidebar .subheader{
-  font-size:10.5px !important;font-weight:700 !important;color:var(--dim) !important;
-  text-transform:uppercase;letter-spacing:.13em;margin:11px 2px 2px !important;
+  font-size:10.5px !important;font-weight:800 !important;color:var(--dim) !important;
+  text-transform:uppercase;letter-spacing:.14em;margin:11px 2px 2px !important;
 }
+#sidebar .subheader::before{content:"◈ ";color:var(--gold);font-size:8px;vertical-align:2px}
 #node-stats{font-size:11px;margin-top:14px;padding:0 4px;color:var(--dim) !important}
 
 /* ── Search ── */
@@ -98,52 +107,53 @@ body.light #sidebar{background:var(--bg3) !important}
   padding:11px 13px !important;font-size:13.5px;font-family:inherit;
 }
 #search::placeholder{color:var(--dim)}
-#search:focus{outline:none;border-color:var(--accent) !important}
+#search:focus{outline:none;border-color:var(--gold) !important;box-shadow:0 0 0 3px var(--gold-dim)}
 
-/* ── Filter buttons → chips ── */
+/* ── Filter buttons → HUD chips ── */
 .button,.filter.button{
   background:var(--card) !important;border:1px solid var(--stroke) !important;
   border-radius:var(--r-sm) !important;color:var(--muted) !important;
   padding:8px 12px !important;margin:3px !important;font-weight:600;font-size:12.5px;
   transition:.15s;
 }
-.button:hover,.filter.button:hover{border-color:var(--stroke-2) !important;color:var(--txt) !important}
+.button:hover,.filter.button:hover{border-color:var(--gold-line) !important;color:var(--txt) !important}
 .button.active,.filter.button.active{
-  color:#06121a !important;border-color:transparent !important;
-  background:linear-gradient(135deg,var(--accent),var(--accent2)) !important;
-  box-shadow:0 4px 14px rgba(124,131,255,.28);
+  color:#0a0d14 !important;border-color:transparent !important;
+  background:linear-gradient(135deg,var(--gold),#c79a4d) !important;
+  box-shadow:0 4px 14px var(--gold-dim);
 }
-body.light .button.active,body.light .filter.button.active{color:#fff !important}
+body.light .button.active,body.light .filter.button.active{color:#fff !important;background:linear-gradient(135deg,#b08a3d,#9a7b34) !important}
 .button.short{min-width:34px;text-align:center}
 .button img,.filter.button img{width:17px;height:17px;vertical-align:-3px}
-/* type chips get accent variety */
-.filter[data-filter=".ephemeral"].active{background:linear-gradient(135deg,var(--violet),#7c6cff) !important;color:#fff !important}
+/* type chips get aether variety */
+.filter[data-filter=".unspoiled"].active{background:linear-gradient(135deg,var(--accent),#3fb6a8) !important;color:#04201c !important}
+.filter[data-filter=".ephemeral"].active{background:linear-gradient(135deg,var(--violet),#8d6cff) !important;color:#fff !important}
 .filter[data-filter=".legendary"].active{background:linear-gradient(135deg,var(--gold),#ff9e54) !important;color:#241500 !important}
 
-/* ── Title / header ── */
+/* ── Title / header bar ── */
 #title{
   text-align:left !important;font-size:0 !important;padding:2px 2px 14px !important;
-  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--stroke);margin-bottom:14px;
+  display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--gold-line);margin-bottom:14px;
 }
 #title a{
   font-size:21px !important;font-weight:800;letter-spacing:-.02em;color:var(--txt);
 }
+#title a::before{content:"◈ ";color:var(--gold);font-size:17px}
 #options{position:static !important;display:inline-flex;align-items:center;gap:6px;margin-left:auto;order:3}
 #options img{
   width:22px !important;height:22px !important;padding:7px !important;border-radius:10px !important;
   background:var(--card) !important;border:1px solid var(--stroke) !important;opacity:.85;
 }
-#options img.active{background:rgba(124,131,255,.16) !important;border-color:rgba(124,131,255,.4) !important;opacity:1}
-/* light mode: white icons would vanish on white chips → give the chips a dark fill instead
-   (filter:invert on the img also inverts its background, so it can't be used here) */
+#options img.active{background:var(--gold-dim) !important;border-color:var(--gold-line) !important;opacity:1}
 body.light #options img{background:#000 !important;border-color:#1a1a1a !important;filter:invert(1);opacity:1}
-body.light #options img.active{background:#1c1b04 !important}  /* invert → 연한 인디고 강조 */
+body.light #options img.active{background:#1c1b04 !important}
 
-/* ── Section headers ── */
+/* ── Section headers (HUD panel) ── */
 .header{
-  background:var(--card) !important;border:1px solid var(--stroke);
+  background:var(--card) !important;border:1px solid var(--gold-line);
   border-radius:12px !important;padding:11px 15px !important;font-size:13px !important;
   font-weight:700;text-align:left !important;margin:8px 0 !important;color:var(--txt);
+  box-shadow:inset 3px 0 0 var(--gold-line);
 }
 .header-icon{filter:saturate(0) brightness(1.6);opacity:.7}
 .timer-list .header,#timeline-header,#maps-header{color:var(--muted) !important}
@@ -151,24 +161,26 @@ body.light #options img.active{background:#1c1b04 !important}  /* invert → 연
 .timer-list.user-list.active .header{color:var(--txt) !important}
 
 /* ── Timeline ── */
-#timeslots,#timeline .hours{background:var(--bg3) !important;border-radius:8px}
-#timeline .hand{background:var(--accent2) !important;box-shadow:0 0 10px rgba(86,211,194,.6);border-radius:2px}
+#timeslots,#timeline .hours{background:var(--bg3) !important;border-radius:8px;border:1px solid var(--stroke)}
+#timeline .hand{background:var(--accent) !important;box-shadow:0 0 10px var(--accent);border-radius:2px}
 
 /* ── Node / Fish cards (block layout) ── */
 .block-layout .timer{
   background:var(--card) !important;border:1px solid var(--stroke);
   border-radius:var(--r) !important;overflow:hidden;margin:0 8px 12px 0 !important;
-  backdrop-filter:blur(8px);box-shadow:0 2px 10px rgba(0,0,0,.18);
-  transition:box-shadow .18s,border-color .18s;  /* transform/크기 제외 → isotope 재배치가 애니메이션되지 않아 레이아웃 전환이 깔끔 */
+  backdrop-filter:blur(8px);box-shadow:0 6px 22px rgba(0,0,0,.28);
+  transition:box-shadow .18s,border-color .18s;
 }
 body.light .block-layout .timer{box-shadow:var(--shadow)}
-.block-layout .timer:hover{border-color:var(--stroke-2);transform:translateY(-2px)}
+.block-layout .timer:hover{border-color:var(--gold-line);transform:translateY(-2px)}
 .block-layout .timer .title{
-  background:transparent !important;padding:13px 14px 8px !important;font-weight:700;font-size:14.5px;
+  background:transparent !important;padding:13px 14px 8px !important;font-weight:800;font-size:14.5px;
   min-height:0 !important;border:none !important;letter-spacing:-.01em;
+  box-shadow:inset 3px 0 0 var(--gold-line);
 }
 .block-layout .timer:hover .title{background:transparent !important}
 .block-layout .timer .title .text{color:var(--txt)}
+.block-layout .timer .title .text::before{content:"◈ ";color:var(--gold);font-size:11px;vertical-align:1px}
 .block-layout .timer .spawn-time{
   top:12px !important;right:13px !important;font-size:13px;font-weight:800;
   font-variant-numeric:tabular-nums;color:var(--muted);
@@ -185,52 +197,55 @@ body.light .block-layout .timer{box-shadow:var(--shadow)}
 }
 .block-layout .timer .info .type{color:var(--dim)}
 
-/* state accents */
-.block-layout .timer.active{border-color:rgba(86,211,194,.42)}
-.block-layout .timer.active .progress-container .progress{background:linear-gradient(90deg,var(--accent2),var(--blue)) !important}
-.block-layout .timer.active .spawn-time{color:var(--accent2)}
-.block-layout .timer.active .title{box-shadow:inset 3px 0 0 var(--accent2)}
-.block-layout .timer.spawning{border-color:rgba(255,206,106,.45)}
-.block-layout .timer.spawning .progress-container .progress{background:linear-gradient(90deg,var(--gold),#ff9e54) !important}
-.block-layout .timer.spawning .spawn-time{color:var(--gold)}
-.block-layout .timer.spawning .title{box-shadow:inset 3px 0 0 var(--gold)}
+/* state accents — 에테르 글로우 */
+.block-layout .timer.active{border-color:rgba(100,227,211,.42)}
+.block-layout .timer.active .progress-container .progress{background:linear-gradient(90deg,var(--accent),var(--blue)) !important}
+.block-layout .timer.active .spawn-time{color:var(--accent)}
+.block-layout .timer.active .title{box-shadow:inset 3px 0 0 var(--accent)}
+.block-layout .timer.active .title .text::before{color:var(--accent)}
+.block-layout .timer.active::after{border-color:var(--accent);opacity:.7}
+.block-layout .timer.spawning{border-color:rgba(255,178,74,.45)}
+.block-layout .timer.spawning .progress-container .progress{background:linear-gradient(90deg,var(--amber),#ff8e3c) !important}
+.block-layout .timer.spawning .spawn-time{color:var(--amber)}
+.block-layout .timer.spawning .title{box-shadow:inset 3px 0 0 var(--amber)}
+.block-layout .timer.spawning .title .text::before{color:var(--amber)}
+.block-layout .timer.spawning::after{border-color:var(--amber);opacity:.7}
 .block-layout .timer.star .title .text::before{content:"★ ";color:var(--gold)}
 
 #favorite .timer{background:var(--card) !important}
 #favorite .timer .title{background:transparent !important}
 
-/* table layout tweaks (옵션으로 테이블뷰 쓸 때도 자연스럽게) */
+/* table layout tweaks */
 .table-layout #timer-container tbody:nth-child(odd){background:var(--card) !important}
 .table-layout #timer-container tbody:hover{background:var(--card-h) !important}
-.table-layout #timer-container .timer.active .time-text{color:var(--accent2) !important}
-.table-layout #timer-container .timer.spawning .time-text{color:var(--gold) !important}
+.table-layout #timer-container .timer.active .time-text{color:var(--accent) !important}
+.table-layout #timer-container .timer.spawning .time-text{color:var(--amber) !important}
 
 /* ── Settings panel ── */
-#settings{background:var(--bg2);border:1px solid var(--stroke);border-radius:14px;padding:8px 16px;margin-top:10px}
+#settings{background:var(--bg2);border:1px solid var(--gold-line);border-radius:14px;padding:8px 16px;margin-top:10px}
 #settings select,#settings input[type=number]{background:var(--bg3);color:var(--txt);border:1px solid var(--stroke);border-radius:8px;padding:5px 8px}
 
 /* ── Maps / popovers ── */
-#list-popover{background:var(--bg2) !important;border:1px solid var(--stroke-2) !important;border-radius:16px !important}
+#list-popover{background:var(--bg2) !important;border:1px solid var(--gold-line) !important;border-radius:16px !important}
 .map-container .position,.map-container .region{background:var(--bg3) !important;border:1px solid var(--stroke) !important;border-radius:8px;color:var(--txt) !important}
 
-/* ── Floating theme toggle ── */
+/* ── Theme toggle ── */
 #theme-toggle{
-  position:relative;box-sizing:border-box;flex:0 0 auto;   /* 헤더 컨트롤 묶음 안의 일반 요소 → 스크롤 시 함께 이동 */
-  width:70px;height:38px;border-radius:20px;cursor:pointer; /* 옆 메뉴/설정 버튼(38px)과 높이 맞춤 */
+  position:relative;box-sizing:border-box;flex:0 0 auto;
+  width:70px;height:38px;border-radius:20px;cursor:pointer;
   background:var(--card);border:1px solid var(--stroke);
   display:inline-flex;align-items:center;padding:0 5px;justify-content:space-between;font-size:15px;
 }
 #theme-toggle .knob{
   position:absolute;top:50%;left:4px;width:30px;height:30px;border-radius:50%;
   transform:translateY(-50%);transition:left .25s;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 2px 8px rgba(0,0,0,.4);
+  background:linear-gradient(135deg,var(--gold),var(--accent));box-shadow:0 2px 8px rgba(0,0,0,.4);
 }
-/* toggle now lives inside #options (in <body>), so body.light + CSS vars handle the theme automatically */
-body.light #theme-toggle .knob{left:34px}  /* padding-box 68px − 노브 30px − 4px = 우측 끝 정렬 */
+body.light #theme-toggle .knob{left:34px}
 
 /* ── Responsive ── */
 @media(max-width:890px){
-  #sidebar{position:static !important;width:100% !important;border-right:none;border-bottom:1px solid var(--stroke);
+  #sidebar{position:static !important;width:100% !important;border-right:none;border-bottom:1px solid var(--gold-line);
     display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:12px !important;text-align:left !important}
   #sidebar .subheader{display:inline-block !important;margin:6px 2px !important}
   #time{font-size:24px !important;margin-right:auto !important}
