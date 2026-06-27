@@ -8,6 +8,7 @@
 :root{
   --bg:#070a11; --bg2:#0c111b; --bg3:#111726;
   --card:rgba(255,255,255,.045); --card-h:rgba(255,255,255,.08);
+  --panel:rgba(20,26,40,.72);
   --stroke:rgba(255,255,255,.07); --stroke-2:rgba(255,255,255,.14);
   --gold:#e3c684; --gold-line:rgba(227,198,132,.22); --gold-dim:rgba(227,198,132,.30);
   --txt:#eef2fa; --muted:#9aa6bd; --dim:#6b768c;
@@ -18,6 +19,7 @@
 body.light{
   --bg:#e8ecf3; --bg2:#f4f7fb; --bg3:#ffffff;
   --card:#ffffff; --card-h:#ffffff;
+  --panel:#ffffff;
   --stroke:rgba(20,30,55,.10); --stroke-2:rgba(20,30,55,.18);
   --gold:#9a7b34; --gold-line:rgba(154,123,52,.30); --gold-dim:rgba(154,123,52,.26);
   --txt:#161b25; --muted:#56607a; --dim:#8c95a8;
@@ -166,9 +168,10 @@ body.light #options img.active{background:#1c1b04 !important}
 
 /* ── Node / Fish cards (block layout) ── */
 .block-layout .timer{
-  background:var(--card) !important;border:1px solid var(--stroke);
+  background:var(--panel) !important;border:1px solid var(--stroke);
   border-radius:var(--r) !important;overflow:hidden;margin:0 8px 12px 0 !important;
-  backdrop-filter:blur(8px);box-shadow:0 6px 22px rgba(0,0,0,.28);
+  box-shadow:0 4px 14px rgba(0,0,0,.22);  /* backdrop-filter 제거: 200+ 카드 블러가 masonry 재배치마다 리페인트 → 필터 토글 딜레이 주범 */
+  contain:layout;  /* 카드별 리플로우 격리 → isotope 높이측정 비용 절감 (paint는 빼서 미끼 오버레이 클리핑 안 됨) */
   transition:box-shadow .18s,border-color .18s;
 }
 body.light .block-layout .timer{box-shadow:var(--shadow)}
@@ -212,7 +215,7 @@ body.light .block-layout .timer{box-shadow:var(--shadow)}
 .block-layout .timer.spawning::after{border-color:var(--amber);opacity:.7}
 .block-layout .timer.star .title .text::before{content:"★ ";color:var(--gold)}
 
-#favorite .timer{background:var(--card) !important}
+#favorite .timer{background:var(--panel) !important}
 #favorite .timer .title{background:transparent !important}
 
 /* table layout tweaks */
